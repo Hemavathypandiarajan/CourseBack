@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/courses")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class CourseController {
 
     private final CourseRepository courseRepository;
@@ -17,13 +17,11 @@ public class CourseController {
         this.courseRepository = courseRepository;
     }
 
-    // GET /api/courses -> list all courses
     @GetMapping
     public List<Course> getAllCourses() {
         return courseRepository.findAll();
     }
 
-    // POST /api/courses -> add new course
     @PostMapping
     public Course createCourse(@RequestBody Course course) {
         if (course.getEnrolledCount() == null) {
@@ -32,14 +30,12 @@ public class CourseController {
         return courseRepository.save(course);
     }
 
-    // PUT /api/courses/{id} -> update existing course
     @PutMapping("/{id}")
     public Course updateCourse(@PathVariable Long id, @RequestBody Course updated) {
         return courseRepository.findById(id)
                 .map(course -> {
                     course.setName(updated.getName());
                     course.setDescription(updated.getDescription());
-                    // Optional: allow updating enrolledCount from client
                     if (updated.getEnrolledCount() != null) {
                         course.setEnrolledCount(updated.getEnrolledCount());
                     }
@@ -48,7 +44,6 @@ public class CourseController {
                 .orElseThrow(() -> new RuntimeException("Course not found with id " + id));
     }
 
-    // DELETE /api/courses/{id} -> delete course
     @DeleteMapping("/{id}")
     public void deleteCourse(@PathVariable Long id) {
         courseRepository.deleteById(id);
